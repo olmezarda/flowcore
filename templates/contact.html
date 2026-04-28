@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-lg-8">
+        <div class="theme-card p-4 p-md-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold mb-2" style="color: var(--text-main);">Bizimle İletişime Geçin</h2>
+                <p style="color: var(--text-muted); font-size: 1.05rem;">Sorularınız, teknik destek veya kurumsal talepleriniz için bize ulaşın.</p>
+            </div>
+            
+            {% if success %}
+            <div class="alert alert-success py-3 px-4 mb-4" role="alert" style="border-radius: 12px; border: none; background-color: rgba(16, 185, 129, 0.1); color: #10B981; font-weight: 500;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                Mesajınız başarıyla iletildi. Ekibimiz en kısa sürede size dönüş yapacaktır.
+            </div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="color: var(--text-muted); font-size: 0.9rem;">Ad Soyad</label>
+                        <input type="text" name="name" class="form-control py-2 px-3" required style="border-radius: 8px;">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold" style="color: var(--text-muted); font-size: 0.9rem;">E-posta Adresi</label>
+                        <input type="email" name="email" class="form-control py-2 px-3" required style="border-radius: 8px;">
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-semibold" style="color: var(--text-muted); font-size: 0.9rem;">Konu</label>
+                    <select name="subject" class="form-select py-2 px-3" style="border-radius: 8px; background-color: var(--input-bg); color: var(--text-main); border-color: var(--border-color);">
+                        <option value="Destek">Teknik Destek</option>
+                        <option value="Satis">Kurumsal Satış</option>
+                        <option value="Diger">Diğer</option>
+                    </select>
+                </div>
+
+                <div class="mb-5">
+                    <label class="form-label fw-semibold" style="color: var(--text-muted); font-size: 0.9rem;">Mesajınız</label>
+                    <textarea name="message" class="form-control py-2 px-3" rows="5" required style="border-radius: 8px; resize: none;"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold" style="border-radius: 10px; font-size: 1.05rem;">
+                    Mesajı Gönder
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

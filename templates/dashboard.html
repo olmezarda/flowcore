@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 mt-2 gap-3">
+    <div>
+        <h2 class="fw-bold mb-1" style="color: var(--text-main) !important;">
+            {% if user.is_staff %}Kurum İçi Tüm Talepler{% else %}Kişisel Panom{% endif %}
+        </h2>
+        <p class="mb-0" style="color: var(--text-muted) !important; font-size: 1.05rem;">
+            {% if user.is_staff %}Kurumunuza gelen tüm süreç taleplerini buradan inceleyebilirsiniz.{% else %}Açtığınız tüm süreçleri ve taleplerin güncel durumlarını buradan takip edebilirsiniz.{% endif %}
+        </p>
+    </div>
+    
+    {% if not user.is_staff %}
+    <a href="{% url 'entity_create' %}" class="btn btn-primary fw-bold px-4 py-3 shadow-sm d-flex align-items-center justify-content-center" style="border-radius: 10px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Yeni Talep Oluştur
+    </a>
+    {% endif %}
+</div>
+
+<div class="theme-card overflow-hidden">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0" style="--bs-table-bg: transparent;">
+            <thead style="background-color: rgba(100, 116, 139, 0.05);">
+                <tr>
+                    <th class="py-3 px-4 fw-semibold border-bottom" style="color: var(--text-muted) !important; font-size: 0.85rem; letter-spacing: 0.5px;">TALEP BAŞLIĞI</th>
+                    <th class="py-3 px-4 fw-semibold border-bottom" style="color: var(--text-muted) !important; font-size: 0.85rem; letter-spacing: 0.5px;">İŞ AKIŞI / SÜREÇ</th>
+                    
+                    {% if user.is_staff %}
+                    <th class="py-3 px-4 fw-semibold border-bottom" style="color: var(--text-muted) !important; font-size: 0.85rem; letter-spacing: 0.5px;">TALEP EDEN</th>
+                    {% endif %}
+                    
+                    <th class="py-3 px-4 fw-semibold border-bottom" style="color: var(--text-muted) !important; font-size: 0.85rem; letter-spacing: 0.5px;">MEVCUT DURUM</th>
+                    <th class="py-3 px-4 fw-semibold border-bottom" style="color: var(--text-muted) !important; font-size: 0.85rem; letter-spacing: 0.5px;">TARİH</th>
+                    <th class="py-3 px-4 fw-semibold border-bottom text-end" style="color: var(--text-muted) !important; font-size: 0.85rem; letter-spacing: 0.5px;">İŞLEM</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entity in entities %}
+                <tr style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;">
+                    <td class="py-3 px-4 fw-bold" style="font-size: 1.05rem; color: var(--text-main) !important;">{{ entity.title }}</td>
+                    
+                    <td class="py-3 px-4">
+                        <span class="badge border" style="background-color: var(--input-bg); font-weight: 500; padding: 0.4em 0.8em; border-radius: 6px; font-size: 0.85rem; color: var(--text-main) !important;">
+                            {{ entity.workflow.name }}
+                        </span>
+                    </td>
+                    
+                    {% if user.is_staff %}
+                    <td class="py-3 px-4 fw-medium" style="color: var(--text-main) !important;">
+                        {{ entity.creator.username }} <span style="font-size: 0.8rem; color: var(--text-muted) !important;">({{ entity.creator.role.name }})</span>
+                    </td>
+                    {% endif %}
+
+                    <td class="py-3 px-4">
+                        <span class="badge bg-{{ entity.current_state.color_class }} shadow-sm" style="padding: 0.5em 0.9em; border-radius: 6px; font-weight: 600; font-size: 0.85rem; color: white !important;">
+                            {{ entity.current_state.name }}
+                        </span>
+                    </td>
+                    
+                    <td class="py-3 px-4" style="color: var(--text-muted) !important; font-size: 0.9rem;">
+                        {{ entity.updated_at|date:"d M Y, H:i" }}
+                    </td>
+                    
+                    <td class="py-3 px-4 text-end">
+                        <a href="{% url 'entity_detail' entity.id %}" class="btn btn-sm px-3 py-2 fw-medium" style="background-color: transparent; border: 1px solid var(--border-color); color: var(--text-main) !important; border-radius: 8px;">
+                            İncele / Yönet
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if user.is_staff %}6{% else %}5{% endif %}" class="text-center py-5">
+                        <div class="mb-4 mt-2" style="opacity: 0.4;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-main) !important;">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="fw-bold mb-2" style="color: var(--text-main) !important;">{% if user.is_staff %}Henüz kurumda açılan bir talep yok.{% else %}Henüz bir talep açmadınız.{% endif %}</h4>
+                        {% if not user.is_staff %}
+                        <p class="mb-4" style="color: var(--text-muted) !important; font-size: 1.05rem;">Sağ üstteki butonu kullanarak ilk kurum içi talebinizi hemen oluşturabilirsiniz.</p>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

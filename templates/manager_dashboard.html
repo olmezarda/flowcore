@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+    <div>
+        <h2 class="fw-bold mb-1" style="color: var(--primary-color);">Organizasyon ve Süreç Merkezi</h2>
+        <p class="mb-0" style="color: var(--text-muted); font-size: 1.05rem;">Kurumunuza ait iş akışlarını, rolleri ve davet kodlarını yönetin.</p>
+    </div>
+</div>
+
+<h5 class="fw-bold mb-4 mt-4 d-flex align-items-center" style="color: var(--text-main); border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+    <span class="d-inline-flex align-items-center justify-content-center rounded me-3" style="background-color: var(--secondary-color); width: 36px; height: 36px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    </span>
+    Ekip ve Rol Yönetimi
+</h5>
+<div class="row g-4 mb-5">
+    <div class="col-lg-5">
+        <div class="admin-panel-card p-4 h-100" style="border-left: 4px solid var(--secondary-color);">
+            <h6 class="fw-bold mb-3" style="color: var(--text-main);">Rol Tanımla ve Yönet</h6>
+            
+            <form method="POST" class="mb-4">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_role">
+                <div class="row g-2 mb-2">
+                    <div class="col-8">
+                        <input type="text" name="role_name" class="form-control py-2 px-3" placeholder="Rol Adı (Örn: Öğrenci)" required style="border-radius: 8px; background-color: var(--input-bg); color: var(--text-main);">
+                    </div>
+                    <div class="col-4">
+                        <input type="text" name="prefix" class="form-control py-2 px-3" placeholder="Ön Ek" maxlength="5" required style="border-radius: 8px; background-color: var(--input-bg); color: var(--text-main); text-transform: uppercase;">
+                    </div>
+                </div>
+                <button type="submit" class="btn w-100 fw-bold" style="background-color: var(--secondary-color); color: white; border-radius: 8px;">Rolü Ekle</button>
+            </form>
+
+            <h6 class="fw-bold mb-2" style="color: var(--text-muted); font-size: 0.85rem;">MEVCUT ROLLER</h6>
+            <ul class="list-group list-group-flush border rounded">
+                {% for role in roles %}
+                <li class="list-group-item d-flex justify-content-between align-items-center" style="background: var(--card-bg); color: var(--text-main); border-color: var(--border-color);">
+                    <span>{{ role.name }} <span class="badge bg-secondary ms-1">{{ role.prefix }}</span></span>
+                    <form method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete_role">
+                        <input type="hidden" name="role_id" value="{{ role.id }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger p-1" onclick="return confirm('Bu rolü silmek istediğinize emin misiniz?');">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </form>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-muted" style="background: var(--card-bg); border-color: var(--border-color);">Sistemde rol bulunmuyor.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="admin-panel-card p-4 h-100" style="border-left: 4px solid var(--secondary-color);">
+            <h6 class="fw-bold mb-3" style="color: var(--text-main);">Toplu Davet Kodu Üret (Maks 50)</h6>
+            
+            <form method="POST" class="d-flex gap-2 align-items-center mb-4">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_invite">
+                <select name="role_id" class="form-select py-2" required style="border-radius: 8px; background-color: var(--input-bg); color: var(--text-main); border-color: var(--border-color); flex-grow: 1;">
+                    <option value="" disabled selected>Rol Seçin</option>
+                    {% for role in roles %}<option value="{{ role.id }}">{{ role.name }}</option>{% endfor %}
+                </select>
+                <input type="number" name="quantity" class="form-control py-2" value="1" min="1" max="50" style="border-radius: 8px; width: 80px; background-color: var(--input-bg); color: var(--text-main);" title="Adet">
+                <button type="submit" class="btn fw-bold px-3 py-2" style="background-color: var(--secondary-color); color: white; border: none; border-radius: 8px; white-space: nowrap;">Üret</button>
+            </form>
+
+            <div class="accordion" id="inviteCodesAccordion">
+                <div class="accordion-item" style="border-color: var(--border-color); background-color: transparent;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCodes" style="background-color: var(--input-bg); color: var(--text-main); border-radius: 8px; border: 1px solid var(--border-color);">
+                            Üretilmiş Tüm Davet Kodlarını Gör ({{ invite_codes|length }})
+                        </button>
+                    </h2>
+                    <div id="collapseCodes" class="accordion-collapse collapse" data-bs-parent="#inviteCodesAccordion">
+                        <div class="accordion-body px-2 py-3" style="max-height: 250px; overflow-y: auto;">
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for invite in invite_codes %}
+                                    {% if invite.is_used %}
+                                        <div class="badge border d-flex align-items-center gap-2 p-2" style="background-color: var(--input-bg); color: var(--text-muted); border-color: var(--border-color) !important; font-size: 0.85rem;">
+                                            <span>{{ invite.code }} ({{ invite.role.prefix }}) Kullanıldı</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="badge border d-flex align-items-center gap-2 p-2" style="background-color: rgba(59, 130, 246, 0.1); color: var(--state-info); border-color: rgba(59, 130, 246, 0.2) !important; font-size: 0.85rem;">
+                                            <span>{{ invite.code }} ({{ invite.role.prefix }})</span>
+                                            <form method="POST" style="margin:0; padding:0; display: flex; align-items: center;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="delete_invite">
+                                                <input type="hidden" name="invite_id" value="{{ invite.id }}">
+                                                <button type="submit" class="btn p-0 border-0 ms-1 d-flex align-items-center" style="background: transparent;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {% endif %}
+                                {% empty %}
+                                    <span class="text-muted w-100 text-center">Henüz kod yok.</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h5 class="fw-bold mb-4 mt-5 d-flex align-items-center" style="color: var(--text-main); border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+    <span class="d-inline-flex align-items-center justify-content-center rounded me-3" style="background-color: var(--secondary-color); width: 36px; height: 36px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+    </span>
+    İş Akışı ve Aşama Kurgusu
+</h5>
+<div class="row g-4 mb-5">
+    <div class="col-lg-5">
+        <div class="admin-panel-card p-4 h-100" style="border-left: 4px solid var(--secondary-color);">
+            <h6 class="fw-bold mb-3" style="color: var(--text-main);">Yeni İş Akışı Yarat</h6>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_workflow">
+                <div class="mb-3">
+                    <input type="text" name="workflow_name" class="form-control py-2 px-3" placeholder="İş Akışı Adı (Örn: Staj Başvurusu)" required style="border-radius: 8px; background-color: var(--input-bg); color: var(--text-main);">
+                </div>
+                
+                <h6 class="fw-bold mb-2" style="color: var(--text-muted); font-size: 0.85rem;">KİMLER BU TALEBİ AÇABİLİR?</h6>
+                <div class="border rounded p-3 mb-3" style="background: var(--input-bg); border-color: var(--border-color) !important; max-height: 120px; overflow-y: auto;">
+                    {% for role in roles %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="allowed_roles" value="{{ role.id }}" id="roleCheck{{ role.id }}">
+                        <label class="form-check-label" for="roleCheck{{ role.id }}" style="color: var(--text-main);">{{ role.name }}</label>
+                    </div>
+                    {% empty %}
+                    <span class="text-muted" style="font-size: 0.85rem;">Önce yukarıdan bir rol oluşturun.</span>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn w-100 fw-bold" style="background-color: var(--secondary-color); color: white; border: none; border-radius: 8px;">Akışı Oluştur</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="admin-panel-card p-4 h-100" style="border-left: 4px solid var(--secondary-color);">
+            <h6 class="fw-bold mb-3" style="color: var(--text-main);">Durum (Aşama) Ekle</h6>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_state">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <select name="workflow_id" class="form-select py-2 px-3" required style="border-radius: 8px; background-color: var(--input-bg); color: var(--text-main); border-color: var(--border-color);">
+                            <option value="" disabled selected>Hangi İş Akışına?</option>
+                            {% for wf in workflows %}<option value="{{ wf.id }}">{{ wf.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" name="state_name" class="form-control py-2 px-3" placeholder="Durum Adı (Örn: Onaylandı)" required style="border-radius: 8px; background-color: var(--input-bg); color: var(--text-main);">
+                    </div>
+                </div>
+                <div class="row g-3 mb-4 align-items-center">
+                    <div class="col-md-6">
+                        <select name="color_class" class="form-select py-2 px-3" required style="border-radius: 8px; background-color: var(--input-bg); color: var(--text-main); border-color: var(--border-color);">
+                            <option value="warning">Sarı (Bekleme/İşlemde)</option>
+                            <option value="primary">Mavi (Bilgi/Aktif)</option>
+                            <option value="success">Yeşil (Onaylandı/Başarılı)</option>
+                            <option value="danger">Kırmızı (Reddedildi)</option>
+                            <option value="secondary">Gri (Pasif/Arşiv)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch ms-2">
+                            <input class="form-check-input" type="checkbox" id="isInitialSwitch" name="is_initial">
+                            <label class="form-check-label fw-medium" for="isInitialSwitch" style="color: var(--text-main);">İlk Durum mu?</label>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn w-100 fw-bold" style="background-color: var(--secondary-color); color: white; border: none; border-radius: 8px;">Durumu Ekle</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<h5 class="fw-bold mb-4 mt-5 d-flex align-items-center" style="color: var(--text-main); border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+    <span class="d-inline-flex align-items-center justify-content-center rounded me-3" style="background-color: var(--secondary-color); width: 36px; height: 36px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+    </span>
+    Kurumun Aktif İş Akışları
+</h5>
+<div class="row g-4 mb-5">
+    {% for workflow in workflows %}
+    <div class="col-md-6 col-lg-4">
+        <div class="admin-panel-card p-4 h-100 position-relative">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+                <h6 class="fw-bold" style="color: var(--text-main);">{{ workflow.name }}</h6>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm p-0" style="color: #F59E0B;" title="Düzenle" data-bs-toggle="modal" data-bs-target="#editWfModal{{ workflow.id }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    </button>
+                    <form method="POST" style="margin:0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete_workflow">
+                        <input type="hidden" name="workflow_id" value="{{ workflow.id }}">
+                        <button type="submit" class="btn btn-sm p-0 pb-1" style="color: #EF4444;" onclick="return confirm('Bu iş akışını silerseniz ona bağlı tüm durumlar da silinir. Emin misiniz?');" title="Sil">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="mb-3" style="font-size: 0.8rem; color: var(--text-muted);">
+                Yetkili Roller: 
+                {% for r in workflow.allowed_roles.all %}{{ r.name }}{% if not forloop.last %}, {% endif %}{% empty %}Herkes{% endfor %}
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                {% for state in workflow.state_set.all %}
+                    <span class="badge bg-{{ state.color_class }}" style="padding: 0.5em 0.8em; border-radius: 6px; font-weight: 500; color: white !important;">
+                        {{ state.name }} {% if state.is_initial %}(İlk){% endif %}
+                    </span>
+                {% empty %}
+                    <span class="text-muted" style="font-size: 0.85rem;">Henüz durum eklenmedi.</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-4"><span style="color: var(--text-muted);">Sistemde tanımlı süreç yok.</span></div>
+    {% endfor %}
+</div>
+
+{% for workflow in workflows %}
+<div class="modal fade" id="editWfModal{{ workflow.id }}" tabindex="-1" aria-labelledby="editWfModalLabel{{ workflow.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;">
+            <div class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center">
+                <h5 class="modal-title fw-bold" id="editWfModalLabel{{ workflow.id }}" style="color: var(--text-main);">Süreci Düzenle</h5>
+                <button type="button" class="btn p-0 border-0 bg-transparent" data-bs-dismiss="modal" aria-label="Close" style="color: var(--text-main);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="edit_workflow">
+                    <input type="hidden" name="workflow_id" value="{{ workflow.id }}">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="color: var(--text-muted); font-size: 0.9rem;">Süreç Adı</label>
+                        <input type="text" name="new_name" class="form-control py-2 px-3" value="{{ workflow.name }}" required style="border-radius: 8px; background-color: var(--input-bg); color: var(--text-main); border-color: var(--border-color);">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold" style="color: var(--text-muted); font-size: 0.9rem;">Kimler Başlatabilir?</label>
+                        <div class="border rounded p-3" style="background: var(--input-bg); border-color: var(--border-color) !important; max-height: 150px; overflow-y: auto;">
+                            {% for role in roles %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="allowed_roles" value="{{ role.id }}" id="editRole{{ workflow.id }}_{{ role.id }}" {% if role in workflow.allowed_roles.all %}checked{% endif %}>
+                                <label class="form-check-label" for="editRole{{ workflow.id }}_{{ role.id }}" style="color: var(--text-main);">{{ role.name }}</label>
+                            </div>
+                            {% empty %}
+                            <span class="text-muted" style="font-size: 0.85rem;">Rol bulunmuyor.</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn w-100 fw-bold shadow-sm" style="border-radius: 8px; color: white; background-color: var(--secondary-color);">Değişiklikleri Kaydet</button>
+                </form>
+
+                <hr style="border-color: var(--border-color); margin: 1.5rem 0;">
+
+                <h6 class="fw-bold mb-3" style="color: var(--text-main); font-size: 0.95rem;">Mevcut Aşamaları Sil</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for state in workflow.state_set.all %}
+                    <form method="POST" style="margin:0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete_state">
+                        <input type="hidden" name="state_id" value="{{ state.id }}">
+                        <button type="submit" class="badge border d-flex align-items-center gap-2 p-2" style="background-color: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color) !important; cursor: pointer;" onclick="return confirm('{{ state.name }} durumunu silmek istediğinize emin misiniz?');">
+                            <span class="badge bg-{{ state.color_class }}">{{ state.name }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </form>
+                    {% empty %}
+                    <span class="text-muted" style="font-size: 0.85rem;">Silinecek bir aşama yok.</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(function(modal) {
+            document.body.appendChild(modal);
+        });
+    });
+</script>
+{% endblock %}
