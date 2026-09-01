@@ -2,11 +2,9 @@
 
 FlowCore, kurum içi iş akışlarının (workflow) esnek, rol bazlı ve dinamik olarak yönetilmesini sağlayan merkezi bir Durum Makinesi (State Machine) platformudur.
 
----
-
 ## Geliştirme Ortamı Kurulum Yönergesi
 
-Projenin yerel (local) ortamda çalıştırılabilmesi ve geliştirme yapılabilmesi için aşağıdaki adımların sırasıyla izlenmesi gerekmektedir:
+Projenin yerel ortamda çalıştırılabilmesi ve geliştirme yapılabilmesi için aşağıdaki adımları sırasıyla izleyebilirsiniz:
 
 **1. Projenin Klonlanması:**
 ```bash
@@ -18,10 +16,10 @@ cd flowcore
 ```bash
 python -m venv venv
 ```
-*(Windows için)* `venv\Scripts\activate`  
-*(macOS/Linux için)* `source venv/bin/activate`
+*Windows için:* `venv\Scripts\activate`
+*macOS/Linux için:* `source venv/bin/activate`
 
-**3. Gerekli Bağımlılıkların (Dependencies) Kurulması:**
+**3. Gerekli Bağımlılıkların Kurulması:**
 ```bash
 pip install -r requirements.txt
 ```
@@ -32,14 +30,12 @@ python manage.py migrate
 ```
 
 **5. Yönetici (Superuser) Hesabının Oluşturulması:**
-*(Sistem yönetim paneline erişim için bu adım zorunludur)*
+*(Sistem yönetim paneline erişim için gereklidir)*
 ```bash
 python manage.py createsuperuser
 ```
 
----
-
 ## İletişim
 
-mail: olm.zarda@gmail.com  
-linkedin: [LinkedIn Profilim](https://www.linkedin.com/in/olmezarda/)
+**E-posta:** olm.zarda@gmail.com
+**LinkedIn:** [Arda Ölmez](https://www.linkedin.com/in/olmezarda/)
