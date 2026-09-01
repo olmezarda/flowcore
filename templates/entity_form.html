@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-8">
+        <div class="theme-card p-4 p-md-5">
+            <h3 class="fw-bold mb-1" style="color: var(--text-main);">Yeni Talep / Başvuru Oluştur</h3>
+            <p class="mb-4" style="color: var(--text-muted);">Lütfen başlatmak istediğiniz süreci seçin ve detayları girin.</p>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold mb-2" style="color: var(--text-main);">Başlatılacak Süreç Türü</label>
+                    <select name="workflow_id" class="form-select py-3 px-3 fw-medium" required style="border-radius: 10px; background-color: var(--input-bg); color: var(--text-main); border-color: var(--border-color);">
+                        <option value="" disabled selected>Lütfen size tanımlı bir süreç seçin...</option>
+                        {% for workflow in workflows %}
+                            <option value="{{ workflow.id }}">{{ workflow.name }}</option>
+                        {% empty %}
+                            <option value="" disabled>Yöneticiniz henüz size uygun bir süreç tanımlamamış.</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold mb-2" style="color: var(--text-main);">Talep Başlığı</label>
+                    <input type="text" name="title" class="form-control py-3 px-3" placeholder="Örn: 2026 Yaz Dönemi Staj Başvurum" required style="border-radius: 10px;">
+                </div>
+
+                <div class="mb-5">
+                    <label class="form-label fw-bold mb-2" style="color: var(--text-main);">Detaylar / İçerik</label>
+                    <textarea name="content" class="form-control py-3 px-3" rows="6" placeholder="Başvurunuzla ilgili kurumun talep ettiği detayları buraya yazabilirsiniz..." required style="border-radius: 10px; resize: vertical;"></textarea>
+                </div>
+
+                <div class="d-flex gap-3 justify-content-end">
+                    <a href="{% url 'dashboard' %}" class="btn px-4 py-2" style="border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px;">İptal</a>
+                    <button type="submit" class="btn btn-primary fw-bold px-5 py-2 shadow-sm" style="border-radius: 8px;">Talebi Gönder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

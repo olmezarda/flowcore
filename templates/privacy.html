@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-lg-10">
+        <div class="theme-card p-4 p-md-5">
+            <div class="mb-4 pb-3 border-bottom" style="border-color: var(--border-color) !important;">
+                <h2 class="fw-bold mb-2" style="color: var(--text-main);">Gizlilik Politikası</h2>
+                <p class="mb-0" style="color: var(--text-muted);">Son güncellenme tarihi: 12 Nisan 2026</p>
+            </div>
+            
+            <div style="color: var(--text-main); font-size: 1.05rem; line-height: 1.7;">
+                <h5 class="fw-bold mt-4" style="color: var(--primary-color);">1. Veri Toplama ve Kullanımı</h5>
+                <p>FlowCore olarak, iş akışı süreçlerinizi optimize etmek amacıyla ad, e-posta ve kurum bilgileriniz gibi temel verilerinizi toplamaktayız. Bu veriler tamamen sistemin sağlıklı işlemesi için kullanılır ve asla üçüncü şahıslara satılmaz.</p>
+                
+                <h5 class="fw-bold mt-4" style="color: var(--primary-color);">2. Durum Makinesi (State Machine) Verileri</h5>
+                <p>Oluşturduğunuz talepler (Entities) ve bunlara ait durum geçişleri (Transitions) şifrelenmiş veritabanlarımızda güvenle saklanmaktadır. Sadece yetkilendirilmiş rol bazlı kullanıcılar bu verilere erişebilir.</p>
+
+                <h5 class="fw-bold mt-4" style="color: var(--primary-color);">3. Çerezler (Cookies)</h5>
+                <p>Sistemde karanlık/aydınlık mod tercihlerinizi ve aktif oturumlarınızı hatırlamak amacıyla teknik çerezler kullanılmaktadır. Tarayıcı ayarlarınızdan çerezleri yönetebilirsiniz.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

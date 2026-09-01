@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowCore</title>
+    <link href="{% static 'vendor/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+    <script>
+        const st = localStorage.getItem('theme');
+        if (st) document.documentElement.setAttribute('data-theme', st);
+    </script>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <nav class="navbar navbar-expand-lg fc-navbar sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+                <img src="{% static 'img/flowcore-logo.png' %}" alt="FlowCore Logo" width="36" height="36" class="me-2">
+                <span class="fw-bold tracking-tight" style="color: var(--text-main); font-size: 1.3rem;">FlowCore</span>
+            </a>
+
+            <button class="navbar-toggler fc-navbar-toggler shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+
+            <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link fc-nav-link" href="{% url 'terms' %}">Çözümler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fc-nav-link" href="{% url 'contact' %}">İletişim</a>
+                    </li>
+                </ul>
+
+                <div class="nav-auth-wrapper mt-2 mt-lg-0">
+                    <button id="themeToggle" class="btn btn-sm d-flex align-items-center justify-content-center me-lg-3" style="width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border-color); color: var(--text-main); background: var(--input-bg);">
+                    </button>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="fc-nav-link text-center">Pano</a>
+                        
+                        {% if user.is_staff %}
+                            <a href="{% url 'manager_dashboard' %}" class="fc-nav-link text-center d-flex align-items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path><path d="M12 2v2"></path><path d="M12 22v-2"></path><path d="m17 20.66-1-1.73"></path><path d="M11 10.27 7 3.34"></path><path d="m20.66 17-1.73-1"></path><path d="m3.34 7 1.73 1"></path><path d="M14 12h8"></path><path d="M2 12h2"></path><path d="m20.66 7-1.73 1"></path><path d="m3.34 17 1.73-1"></path><path d="m17 3.34-1 1.73"></path><path d="m11 13.73-4 6.93"></path></svg>
+                                Süreç Yönetimi
+                            </a>
+                        {% endif %}
+
+                        <div class="user-profile-nav shadow-sm d-lg-none mt-2 w-100">
+                            <span class="fw-medium" style="color: var(--text-main);">{{ user.username }}</span>
+                            <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-danger fw-medium" style="border-radius: 8px;">Çıkış</a>
+                        </div>
+
+                        <div class="d-none d-lg-flex align-items-center ms-lg-3 border-start ps-lg-3 py-2 py-lg-0" style="border-color: var(--border-color) !important;">
+                            <span class="me-3 fw-medium" style="color: var(--text-main);">{{ user.username }}</span>
+                            <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-danger fw-medium" style="border-radius: 8px;">Çıkış</a>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="fc-nav-link text-center">Giriş Yap</a>
+                        <a href="{% url 'register' %}" class="btn btn-sm btn-primary fw-medium px-4 ms-lg-2" style="border-radius: 8px; padding-top: 0.5rem; padding-bottom: 0.5rem;">Ücretsiz Başla</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container pb-5 pt-4 flex-grow-1 fade-in-up">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="mt-auto py-4 fc-footer">
+        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <div class="mb-3 mb-md-0 d-flex align-items-center">
+                <img src="{% static 'img/flowcore-logo.png' %}" alt="FlowCore Logo" width="24" height="24" class="me-2" style="opacity: 0.8; filter: grayscale(100%);">
+                <span style="color: var(--text-muted); font-weight: 500; font-size: 0.9rem;">&copy; 2026 FlowCore Systems. Tüm hakları saklıdır.</span>
+            </div>
+            <div class="d-flex gap-4">
+                <a href="{% url 'privacy' %}" class="fc-footer-link">Gizlilik Politikası</a>
+                <a href="{% url 'terms' %}" class="fc-footer-link">Kullanım Şartları</a>
+                <a href="{% url 'contact' %}" class="fc-footer-link">Bize Ulaşın</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'vendor/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
